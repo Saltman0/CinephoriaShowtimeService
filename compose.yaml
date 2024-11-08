@@ -22,7 +22,7 @@ services:
       IS_VERBOSE_ENABLED: ${IS_VERBOSE_ENABLED}
       IS_SSL_ENABLED: ${IS_SSL_ENABLED}
     ports:
-      - "3001:3000"
+      - "3003:3000"
     volumes:
       - .:/app
     depends_on:
@@ -32,7 +32,7 @@ services:
     container_name: postgres_showtime
     image: postgres:17-alpine
     ports:
-      - "5433:5432"
+      - "5435:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
