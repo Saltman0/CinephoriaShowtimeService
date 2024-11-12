@@ -22,7 +22,7 @@ services:
       IS_VERBOSE_ENABLED: ${IS_VERBOSE_ENABLED}
       IS_SSL_ENABLED: ${IS_SSL_ENABLED}
     networks:
-      - cineporia_showtime_network
+      - cinephoria_showtime_network
     ports:
       - "3003:3000"
     volumes:
@@ -40,7 +40,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: ${POSTGRES_HOST_AUTH_METHOD}
       POSTGRES_INITDB_ARGS: ${POSTGRES_INITDB_ARGS}
     networks:
-      - cineporia_showtime_network
+      - cinephoria_showtime_network
     ports:
       - "5435:5432"
     restart: unless-stopped
@@ -48,8 +48,8 @@ services:
       - postgres_showtime_data:/var/lib/postgresql/data
 
 networks:
-  cineporia_showtime_network:
-    name: cineporia_showtime_network
+  cinephoria_showtime_network:
+    name: cinephoria_showtime_network
     driver: bridge
     ipam:
       config:
