@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm/sql/expressions/conditions";
 
 
 export async function findShowtimes(movieId: number, startDate: Date|null, endDate: Date|null) {
-    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtimes"' +
+    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime"' +
         ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"' +
         ` WHERE "movieId" = ${movieId} `;
 
