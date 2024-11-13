@@ -4,9 +4,8 @@ import * as showtimeRepository from "../repository/showtime.repository";
 export async function getShowtimes(req: Request, res: Response) {
     try {
         const showtimes = await showtimeRepository.findShowtimes(
-            parseInt(req.params.movieId),
-            req.params.startDate ? new Date(req.params.startDate) : null,
-            req.params.endDate ? new Date(req.params.endDate) : null
+            req.query.startDate as string ?? null,
+            req.query.endDate as string ?? null,
         );
 
         if (showtimes !== null) {

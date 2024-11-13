@@ -4,13 +4,12 @@ import { showtime } from "../schema/showtime";
 import { eq } from "drizzle-orm/sql/expressions/conditions";
 
 
-export async function findShowtimes(movieId: number, startDate: Date|null, endDate: Date|null) {
-    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime"' +
-        ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"' +
-        ` WHERE "movieId" = ${movieId} `;
+export async function findShowtimes(startDate: string|null, endDate: string|null) {
+    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
+        ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"';
 
     if (startDate !== null && endDate != null) {
-        findShowtimesQuery += ` WHERE "showtime"."startTime" >= ${startDate} AND "showtime"."endTime" <= ${endDate}`;
+        findShowtimesQuery += ` WHERE "showtime"."startTime" >= '${startDate}' AND "showtime"."endTime" <= '${endDate}'`;
     }
 
     findShowtimesQuery += ' ORDER BY "showtime"."id" ASC';
