@@ -43,7 +43,7 @@ export async function createShowtime(req: Request, res: Response) {
         const showtimeToCreate = await showtimeRepository.insertShowtime(
             new Date(req.body.startTime),
             new Date(req.body.endTime),
-            parseFloat(req.body.price),
+            parseInt(req.body.price),
             parseInt(req.body.movieId),
             parseInt(req.body.hallId)
         );
@@ -62,12 +62,12 @@ export async function updateShowtime(req: Request, res: Response) {
             parseInt(req.params.id),
             new Date(req.body.startTime),
             new Date(req.body.endTime),
-            parseFloat(req.body.price),
+            parseInt(req.body.price),
             parseInt(req.body.movieId),
             parseInt(req.body.hallId)
         );
 
-        res.status(200).json(showtimeToUpdate);
+        res.status(204).json(showtimeToUpdate);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -81,7 +81,7 @@ export async function deleteShowtime(req: Request, res: Response) {
             parseInt(req.params.id)
         );
 
-        res.status(200).json(showtimeToDelete);
+        res.status(204).json(showtimeToDelete);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
