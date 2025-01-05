@@ -32,61 +32,59 @@ export async function findShowtimeById(showtimeId: number) {
         const result = await database
             .select()
             .from(showtime)
-            .where(eq(showtime.id, showtimeId))
-            .prepare("findShowtimeById")
-            .execute();
+            .where(eq(showtime.id, showtimeId));
 
         if (result.length === 0) {
             return null;
         }
 
-        return result;
+        return result[0];
     } catch (error) {
         throw error;
     }
 }
 
 export async function insertShowtime(startTime: Date, endTime: Date, price: number, movieId: number, hallId: number) {
-    const prepareInsertShowtime = database
-        .insert(showtime)
-        .values(showtimeFactory.createShowtime(startTime, endTime, price, movieId, hallId))
-        .prepare("insertShowtime");
-
     try {
-        await prepareInsertShowtime.execute();
+        const prepareInsertShowtime = await database
+            .insert(showtime)
+            .values(showtimeFactory.createShowtime(startTime, endTime, price, movieId, hallId))
+            .returning();
+
+        return prepareInsertShowtime[0];
     } catch (error) {
         throw error;
     }
 }
 
 export async function updateShowtime(id: number, startTime: Date|null, endTime: Date|null, price: number|null, movieId: number|null, hallId: number|null) {
-    const preparedUpdateShowtime = database
-        .update(showtime)
-        .set({
-            startTime: startTime ?? undefined,
-            endTime: endTime ?? undefined,
-            price: price ?? undefined,
-            movieId: movieId ?? undefined,
-            hallId: hallId ?? undefined
-        })
-        .where(eq(showtime.id, id))
-        .prepare("updateShowtime");
-
     try {
-        await preparedUpdateShowtime.execute();
+        const preparedUpdateShowtime = await database
+            .update(showtime)
+            .set({
+                startTime: startTime ?? undefined,
+                endTime: endTime ?? undefined,
+                price: price ?? undefined,
+                movieId: movieId ?? undefined,
+                hallId: hallId ?? undefined
+            })
+            .where(eq(showtime.id, id))
+            .returning();
+
+        return preparedUpdateShowtime[0];
     } catch (error) {
         throw error;
     }
 }
 
 export async function deleteShowtime(id: number) {
-    const prepareDeleteShowtime = database
+    const prepareDeleteShowtime = await database
         .delete(showtime)
         .where(eq(showtime.id, id))
-        .prepare("deleteShowtime");
+        .returning({ id: showtime.id });
 
     try {
-        await prepareDeleteShowtime.execute();
+        return prepareDeleteShowtime[0];
     } catch (error) {
         throw error;
     }
