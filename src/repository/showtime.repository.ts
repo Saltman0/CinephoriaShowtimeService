@@ -3,7 +3,6 @@ import { database } from "../config/database";
 import { showtime } from "../schema/showtime";
 import { eq } from "drizzle-orm/sql/expressions/conditions";
 
-
 export async function findShowtimes(startDate: string|null, endDate: string|null) {
     let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
         ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"';
