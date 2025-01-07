@@ -50,7 +50,7 @@ export async function createShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "create", showtime: showtimeToCreate}));
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "create", body: showtimeToCreate}));
 
         res.status(201).json(showtimeToCreate);
     } catch (error) {
@@ -71,7 +71,7 @@ export async function updateShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "update", showtime: showtimeToUpdate}));
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "update", body: showtimeToUpdate}));
 
         res.status(200).json(showtimeToUpdate);
     } catch (error) {
@@ -87,7 +87,7 @@ export async function deleteShowtime(req: Request, res: Response) {
             parseInt(req.params.id)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", showtime: showtimeToDelete}));
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", body: showtimeToDelete}));
 
         res.status(200).json({ message: "Showtime deleted successfully." });
     } catch (error) {
