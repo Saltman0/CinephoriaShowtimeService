@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import * as showtimeRepository from "../repository/showtime.repository";
+import { publishMessage } from "../rabbitmq";
 
 export async function getShowtimes(req: Request, res: Response) {
     try {
+        //TODO FONCTION A CORRIGER
         const showtimes = await showtimeRepository.findShowtimes(
             req.query.startDate as string ?? null,
             req.query.endDate as string ?? null,
@@ -11,7 +13,7 @@ export async function getShowtimes(req: Request, res: Response) {
         if (showtimes !== null) {
             res.status(200).json(showtimes);
         } else {
-            res.status(404).json({error : `Showtimes not found.`});
+            res.status(404).json({ message : `Showtimes not found.` });
         }
     } catch (error) {
         if (error instanceof Error) {
@@ -29,7 +31,7 @@ export async function getShowtimeById(req: Request, res: Response) {
         if (showtime !== null) {
             res.status(200).json(showtime);
         } else {
-            res.status(404).json({error : `Showtime ${showtimeId} not found.`});
+            res.status(404).json({ message : `Showtime ${showtimeId} not found.` });
         }
     } catch (error) {
         if (error instanceof Error) {
@@ -47,6 +49,8 @@ export async function createShowtime(req: Request, res: Response) {
             parseInt(req.body.movieId),
             parseInt(req.body.hallId)
         );
+
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "create", body: showtimeToCreate}));
 
         res.status(201).json(showtimeToCreate);
     } catch (error) {
@@ -67,7 +71,9 @@ export async function updateShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        res.status(204).json(showtimeToUpdate);
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "update", body: showtimeToUpdate}));
+
+        res.status(200).json(showtimeToUpdate);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -81,7 +87,9 @@ export async function deleteShowtime(req: Request, res: Response) {
             parseInt(req.params.id)
         );
 
-        res.status(204).json(showtimeToDelete);
+        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", body: showtimeToDelete}));
+
+        res.status(200).json({ message: "Showtime deleted successfully." });
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
