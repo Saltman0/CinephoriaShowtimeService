@@ -2,7 +2,6 @@ import * as showtimeFactory from "../factory/showtime.factory";
 import { database } from "../config/database";
 import { showtime } from "../schema/showtime";
 import { and, eq, gte, lte } from "drizzle-orm/sql/expressions/conditions";
-import {logger} from "../app";
 import { DateTime } from "luxon";
 
 export async function findShowtimes(startDate: string|null, endDate: string|null) {
