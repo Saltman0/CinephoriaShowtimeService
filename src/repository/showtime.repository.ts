@@ -1,7 +1,9 @@
 import * as showtimeFactory from "../factory/showtime.factory";
 import { database } from "../config/database";
 import { showtime } from "../schema/showtime";
-import { eq } from "drizzle-orm/sql/expressions/conditions";
+import { and, eq, gte, lte } from "drizzle-orm/sql/expressions/conditions";
+import {logger} from "../app";
+import { DateTime } from "luxon";
 
 export async function findShowtimes(startDate: string|null, endDate: string|null) {
     let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
@@ -32,6 +34,31 @@ export async function findShowtimeById(showtimeId: number) {
             .select()
             .from(showtime)
             .where(eq(showtime.id, showtimeId));
+
+        if (result.length === 0) {
+            return null;
+        }
+
+        return result[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function findCurrentShowtimeByHall(hallId: number) {
+    try {
+        const now: DateTime = DateTime.now().setZone("Europe/Paris");
+
+        const result = await database
+            .select()
+            .from(showtime)
+            .where(
+                and(
+                    eq(showtime.hallId, hallId),
+                    lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
+                    gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
+                )
+            );
 
         if (result.length === 0) {
             return null;
