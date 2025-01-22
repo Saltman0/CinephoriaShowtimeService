@@ -17,10 +17,6 @@ export async function findShowtimes(startDate: string|null, endDate: string|null
     try {
         let result = await database.execute(findShowtimesQuery);
 
-        if (result.rows.length === 0) {
-            return null;
-        }
-
         return result.rows;
     } catch (error) {
         throw error;
