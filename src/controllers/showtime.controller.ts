@@ -40,6 +40,24 @@ export async function getShowtimeById(req: Request, res: Response) {
     }
 }
 
+export async function getCurrentShowtimeByHall(req: Request, res: Response) {
+    try {
+        const hallId: number = parseInt(req.params.hallId);
+
+        const showtime = await showtimeRepository.findCurrentShowtimeByHall(hallId);
+
+        if (showtime !== null) {
+            res.status(200).json(showtime);
+        } else {
+            res.status(404).json({ message : `No current showtime from hall ${hallId} found.` });
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
 export async function createShowtime(req: Request, res: Response) {
     try {
         const showtimeToCreate = await showtimeRepository.insertShowtime(
