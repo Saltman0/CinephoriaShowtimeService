@@ -10,11 +10,7 @@ export async function getShowtimes(req: Request, res: Response) {
             req.query.endDate as string ?? null,
         );
 
-        if (showtimes !== null) {
-            res.status(200).json(showtimes);
-        } else {
-            res.status(404).json({ message : `Showtimes not found.` });
-        }
+        res.status(200).json(showtimes);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -28,11 +24,7 @@ export async function getShowtimeById(req: Request, res: Response) {
 
         const showtime = await showtimeRepository.findShowtimeById(showtimeId);
 
-        if (showtime !== null) {
-            res.status(200).json(showtime);
-        } else {
-            res.status(404).json({ message : `Showtime ${showtimeId} not found.` });
-        }
+        res.status(200).json(showtime);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -46,11 +38,7 @@ export async function getCurrentShowtimeByHall(req: Request, res: Response) {
 
         const showtime = await showtimeRepository.findCurrentShowtimeByHall(hallId);
 
-        if (showtime !== null) {
-            res.status(200).json(showtime);
-        } else {
-            res.status(404).json({ message : `No current showtime from hall ${hallId} found.` });
-        }
+        res.status(200).json(showtime);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
