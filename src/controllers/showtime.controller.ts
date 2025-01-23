@@ -20,7 +20,7 @@ export async function getShowtimes(req: Request, res: Response) {
 
 export async function getShowtimeById(req: Request, res: Response) {
     try {
-        const showtimeId: number = parseInt(req.params.id);
+        const showtimeId: number = parseInt(req.params.showtimeId);
 
         const showtime = await showtimeRepository.findShowtimeById(showtimeId);
 
@@ -83,7 +83,7 @@ export async function createShowtime(req: Request, res: Response) {
 export async function updateShowtime(req: Request, res: Response) {
     try {
         const showtimeToUpdate = await showtimeRepository.updateShowtime(
-            parseInt(req.params.id),
+            parseInt(req.params.showtimeId),
             new Date(req.body.startTime),
             new Date(req.body.endTime),
             parseInt(req.body.price),
@@ -104,7 +104,7 @@ export async function updateShowtime(req: Request, res: Response) {
 export async function deleteShowtime(req: Request, res: Response) {
     try {
         const showtimeToDelete = await showtimeRepository.deleteShowtime(
-            parseInt(req.params.id)
+            parseInt(req.params.showtimeId)
         );
 
         await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", body: showtimeToDelete}));
