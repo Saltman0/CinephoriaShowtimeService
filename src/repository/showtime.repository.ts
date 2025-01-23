@@ -3,6 +3,19 @@ import { database } from "../config/database";
 import { showtime } from "../schema/showtime";
 import { and, eq, gte, lte } from "drizzle-orm/sql/expressions/conditions";
 import { DateTime } from "luxon";
+import { asc } from "drizzle-orm/sql/expressions/select";
+
+export async function findShowtimesByMovie(movieId: number) {
+    try {
+        return await database
+            .select()
+            .from(showtime)
+            .where(eq(showtime.movieId, movieId))
+            .orderBy(asc(showtime.id));
+    } catch (error) {
+        throw error;
+    }
+}
 
 export async function findShowtimes(startDate: string|null, endDate: string|null) {
     let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
