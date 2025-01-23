@@ -2,20 +2,6 @@ import { Request, Response } from 'express';
 import * as showtimeRepository from "../repository/showtime.repository";
 import { publishMessage } from "../rabbitmq";
 
-export async function getShowtimesByMovie(req: Request, res: Response) {
-    try {
-        const showtimesByMovie = await showtimeRepository.findShowtimesByMovie(
-            parseInt(req.params.movieId)
-        );
-
-        res.status(200).json(showtimesByMovie);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-}
-
 export async function getShowtimes(req: Request, res: Response) {
     try {
         //TODO FONCTION A CORRIGER
@@ -39,6 +25,20 @@ export async function getShowtimeById(req: Request, res: Response) {
         const showtime = await showtimeRepository.findShowtimeById(showtimeId);
 
         res.status(200).json(showtime);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+
+export async function getShowtimesByMovie(req: Request, res: Response) {
+    try {
+        const showtimesByMovie = await showtimeRepository.findShowtimesByMovie(
+            parseInt(req.params.movieId)
+        );
+
+        res.status(200).json(showtimesByMovie);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
