@@ -34,11 +34,19 @@ export async function getShowtimeById(req: Request, res: Response) {
 
 export async function getCurrentShowtimes(req: Request, res: Response) {
     try {
-        const showtime = await showtimeRepository.findCurrentShowtimes(
-            req.query.hallId ? parseInt(<string>req.query.hallId) : null
-        );
+        const hallId = req.query.hallId ? parseInt(<string>req.query.hallId) : null;
 
-        res.status(200).json(showtime);
+        if (hallId !== null && isNaN(hallId)) {
+            res.status(400).json({ message: "Invalid hallId parameter" });
+        }
+
+        const currentShowtimes = await showtimeRepository.findCurrentShowtimes(hallId);
+
+        if (hallId !== null) {
+            res.status(200).json(currentShowtimes.length > 0 ? currentShowtimes[0] : null);
+        } else {
+            res.status(200).json(currentShowtimes);
+        }
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
