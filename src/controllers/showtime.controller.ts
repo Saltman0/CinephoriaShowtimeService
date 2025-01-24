@@ -32,20 +32,6 @@ export async function getShowtimeById(req: Request, res: Response) {
     }
 }
 
-export async function getShowtimesByMovie(req: Request, res: Response) {
-    try {
-        const showtimesByMovie = await showtimeRepository.findShowtimesByMovie(
-            parseInt(req.params.movieId)
-        );
-
-        res.status(200).json(showtimesByMovie);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-}
-
 export async function getCurrentShowtimeByHall(req: Request, res: Response) {
     try {
         const hallId: number = parseInt(req.params.hallId);
