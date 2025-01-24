@@ -22,6 +22,10 @@ export async function getShowtimeById(req: Request, res: Response) {
     try {
         const showtimeId: number = parseInt(req.params.showtimeId);
 
+        if (isNaN(showtimeId)) {
+            res.status(400).json({ message: "Invalid showtimeId parameter" });
+        }
+
         const showtime = await showtimeRepository.findShowtimeById(showtimeId);
 
         res.status(200).json(showtime);
