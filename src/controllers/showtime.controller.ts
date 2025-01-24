@@ -32,11 +32,11 @@ export async function getShowtimeById(req: Request, res: Response) {
     }
 }
 
-export async function getCurrentShowtimeByHall(req: Request, res: Response) {
+export async function getCurrentShowtimes(req: Request, res: Response) {
     try {
-        const hallId: number = parseInt(req.params.hallId);
-
-        const showtime = await showtimeRepository.findCurrentShowtimeByHall(hallId);
+        const showtime = await showtimeRepository.findCurrentShowtimes(
+            req.query.hallId ? parseInt(<string>req.query.hallId) : null
+        );
 
         res.status(200).json(showtime);
     } catch (error) {

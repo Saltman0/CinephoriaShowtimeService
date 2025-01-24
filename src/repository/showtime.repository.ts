@@ -1,21 +1,8 @@
 import * as showtimeFactory from "../factory/showtime.factory";
-import { database } from "../config/database";
-import { showtime } from "../schema/showtime";
-import { and, eq, gte, lte } from "drizzle-orm/sql/expressions/conditions";
-import { DateTime } from "luxon";
-import { asc } from "drizzle-orm/sql/expressions/select";
-
-export async function findShowtimesByMovie(movieId: number) {
-    try {
-        return await database
-            .select()
-            .from(showtime)
-            .where(eq(showtime.movieId, movieId))
-            .orderBy(asc(showtime.id));
-    } catch (error) {
-        throw error;
-    }
-}
+import {database} from "../config/database";
+import {showtime} from "../schema/showtime";
+import {and, eq, gte, lte} from "drizzle-orm/sql/expressions/conditions";
+import {DateTime} from "luxon";
 
 export async function findShowtimes(movieId: number|null, startDate: string|null, endDate: string|null) {
     let findShowtimesQuery = 'SELECT * FROM showtime';
@@ -66,26 +53,25 @@ export async function findShowtimeById(showtimeId: number) {
     }
 }
 
-export async function findCurrentShowtimeByHall(hallId: number) {
+export async function findCurrentShowtimes(hallId: number|null) {
     try {
         const now: DateTime = DateTime.now().setZone("Europe/Paris");
 
-        const result = await database
-            .select()
-            .from(showtime)
-            .where(
-                and(
-                    eq(showtime.hallId, hallId),
-                    lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
-                    gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
-                )
+        const conditions = hallId !== null
+            ? and(
+                eq(showtime.hallId, hallId),
+                lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
+                gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
+            )
+            : and(
+                lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
+                gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
             );
 
-        if (result.length === 0) {
-            return null;
-        }
-
-        return result[0];
+        return await database
+            .select()
+            .from(showtime)
+            .where(conditions);
     } catch (error) {
         throw error;
     }
