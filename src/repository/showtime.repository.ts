@@ -17,15 +17,28 @@ export async function findShowtimesByMovie(movieId: number) {
     }
 }
 
-export async function findShowtimes(startDate: string|null, endDate: string|null) {
-    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
-        ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"';
+export async function findShowtimes(movieId: number|null, startDate: string|null, endDate: string|null) {
+    let findShowtimesQuery = 'SELECT * FROM showtime';
 
-    if (startDate !== null && endDate != null) {
-        findShowtimesQuery += ` WHERE "showtime"."startTime" >= '${startDate}' AND "showtime"."endTime" <= '${endDate}'`;
+    const conditions: string[] = [];
+
+    if (movieId !== null) {
+        conditions.push(`showtime."movieId" = '${movieId}'`);
     }
 
-    findShowtimesQuery += ' ORDER BY "showtime"."id" ASC';
+    if (startDate !== null) {
+        conditions.push(`showtime."startTime" >= '${startDate}'`);
+    }
+
+    if (endDate !== null) {
+        conditions.push(`showtime."endTime" <= '${endDate}'`);
+    }
+
+    if (conditions.length > 0) {
+        findShowtimesQuery += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    findShowtimesQuery += ' ORDER BY showtime."id" ASC';
 
     try {
         let result = await database.execute(findShowtimesQuery);

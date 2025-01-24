@@ -4,10 +4,10 @@ import { publishMessage } from "../rabbitmq";
 
 export async function getShowtimes(req: Request, res: Response) {
     try {
-        //TODO FONCTION A CORRIGER
         const showtimes = await showtimeRepository.findShowtimes(
-            req.query.startDate as string ?? null,
-            req.query.endDate as string ?? null,
+            req.query.movieId ? parseInt(<string>req.query.movieId) : null,
+            <string>req.query.startDate ?? null,
+            <string>req.query.endDate ?? null
         );
 
         res.status(200).json(showtimes);
