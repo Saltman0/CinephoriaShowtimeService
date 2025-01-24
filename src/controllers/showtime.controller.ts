@@ -24,11 +24,11 @@ export async function getShowtimeById(req: Request, res: Response) {
 
         if (isNaN(showtimeId)) {
             res.status(400).json({ message: "Invalid showtimeId parameter" });
+        } else {
+            const showtime = await showtimeRepository.findShowtimeById(showtimeId);
+
+            res.status(200).json(showtime);
         }
-
-        const showtime = await showtimeRepository.findShowtimeById(showtimeId);
-
-        res.status(200).json(showtime);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -42,14 +42,14 @@ export async function getCurrentShowtimes(req: Request, res: Response) {
 
         if (hallId !== null && isNaN(hallId)) {
             res.status(400).json({ message: "Invalid hallId parameter" });
-        }
-
-        const currentShowtimes = await showtimeRepository.findCurrentShowtimes(hallId);
-
-        if (hallId !== null) {
-            res.status(200).json(currentShowtimes.length > 0 ? currentShowtimes[0] : null);
         } else {
-            res.status(200).json(currentShowtimes);
+            const currentShowtimes = await showtimeRepository.findCurrentShowtimes(hallId);
+
+            if (hallId !== null) {
+                res.status(200).json(currentShowtimes.length > 0 ? currentShowtimes[0] : null);
+            } else {
+                res.status(200).json(currentShowtimes);
+            }
         }
     } catch (error) {
         if (error instanceof Error) {
