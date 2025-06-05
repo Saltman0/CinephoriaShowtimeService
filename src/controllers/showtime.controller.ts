@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import * as showtimeRepository from "../repository/showtime.repository";
-import { publishMessage } from "../rabbitmq";
 
 export async function getShowtimes(req: Request, res: Response) {
     try {
@@ -68,8 +67,6 @@ export async function createShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "create", body: showtimeToCreate}));
-
         res.status(201).json(showtimeToCreate);
     } catch (error) {
         if (error instanceof Error) {
@@ -89,8 +86,6 @@ export async function updateShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "update", body: showtimeToUpdate}));
-
         res.status(200).json(showtimeToUpdate);
     } catch (error) {
         if (error instanceof Error) {
@@ -104,8 +99,6 @@ export async function deleteShowtime(req: Request, res: Response) {
         const showtimeToDelete = await showtimeRepository.deleteShowtime(
             parseInt(req.params.showtimeId)
         );
-
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", body: showtimeToDelete}));
 
         res.status(200).json({ message: "Showtime deleted successfully." });
     } catch (error) {
