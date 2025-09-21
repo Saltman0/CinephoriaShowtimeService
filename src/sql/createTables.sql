@@ -1,8 +1,3 @@
--- Cinéphoria showtime service database
-DROP DATABASE IF EXISTS "cinephoriaShowtimeServiceDatabase";
-CREATE DATABASE "cinephoriaShowtimeServiceDatabase";
--- Cinéphoria movie service database
-
 -- Showtime table
 DROP TABLE IF EXISTS showtime;
 CREATE TABLE IF NOT EXISTS showtime
