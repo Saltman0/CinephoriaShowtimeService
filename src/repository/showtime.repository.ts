@@ -1,26 +1,34 @@
 import * as showtimeFactory from "../factory/showtime.factory";
-import { database } from "../config/database";
-import { showtime } from "../schema/showtime";
-import { and, eq, gte, lte } from "drizzle-orm/sql/expressions/conditions";
-import {logger} from "../app";
-import { DateTime } from "luxon";
+import {database} from "../config/database";
+import {showtime} from "../schema/showtime";
+import {and, eq, gte, lte} from "drizzle-orm/sql/expressions/conditions";
+import {DateTime} from "luxon";
 
-export async function findShowtimes(startDate: string|null, endDate: string|null) {
-    let findShowtimesQuery = 'SELECT "showtime"."id", "showtime"."startTime", "showtime"."endTime", "hall"."number", "hall"."projectionQuality" FROM "showtime" ' +
-        ' INNER JOIN "hall" ON "showtime"."hallId" = "hall"."id"';
+export async function findShowtimes(movieId: number|null, startDate: string|null, endDate: string|null) {
+    let findShowtimesQuery = 'SELECT * FROM showtime';
 
-    if (startDate !== null && endDate != null) {
-        findShowtimesQuery += ` WHERE "showtime"."startTime" >= '${startDate}' AND "showtime"."endTime" <= '${endDate}'`;
+    const conditions: string[] = [];
+
+    if (movieId !== null) {
+        conditions.push(`showtime."movieId" = '${movieId}'`);
     }
 
-    findShowtimesQuery += ' ORDER BY "showtime"."id" ASC';
+    if (startDate !== null) {
+        conditions.push(`showtime."startTime" >= '${startDate}'`);
+    }
+
+    if (endDate !== null) {
+        conditions.push(`showtime."endTime" <= '${endDate}'`);
+    }
+
+    if (conditions.length > 0) {
+        findShowtimesQuery += ' WHERE ' + conditions.join(' AND ');
+    }
+
+    findShowtimesQuery += ' ORDER BY showtime."id" ASC';
 
     try {
         let result = await database.execute(findShowtimesQuery);
-
-        if (result.rows.length === 0) {
-            return null;
-        }
 
         return result.rows;
     } catch (error) {
@@ -45,26 +53,25 @@ export async function findShowtimeById(showtimeId: number) {
     }
 }
 
-export async function findCurrentShowtimeByHall(hallId: number) {
+export async function findCurrentShowtimes(hallId: number|null) {
     try {
         const now: DateTime = DateTime.now().setZone("Europe/Paris");
 
-        const result = await database
-            .select()
-            .from(showtime)
-            .where(
-                and(
-                    eq(showtime.hallId, hallId),
-                    lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
-                    gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
-                )
+        const conditions = hallId !== null
+            ? and(
+                eq(showtime.hallId, hallId),
+                lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
+                gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
+            )
+            : and(
+                lte(showtime.startTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss"))),
+                gte(showtime.endTime, new Date(now.toFormat("yyyy-MM-dd HH:mm:ss")))
             );
 
-        if (result.length === 0) {
-            return null;
-        }
-
-        return result[0];
+        return await database
+            .select()
+            .from(showtime)
+            .where(conditions);
     } catch (error) {
         throw error;
     }

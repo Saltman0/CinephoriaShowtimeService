@@ -1,20 +1,15 @@
 import { Request, Response } from 'express';
 import * as showtimeRepository from "../repository/showtime.repository";
-import { publishMessage } from "../rabbitmq";
 
 export async function getShowtimes(req: Request, res: Response) {
     try {
-        //TODO FONCTION A CORRIGER
         const showtimes = await showtimeRepository.findShowtimes(
-            req.query.startDate as string ?? null,
-            req.query.endDate as string ?? null,
+            req.query.movieId ? parseInt(<string>req.query.movieId) : null,
+            <string>req.query.startDate ?? null,
+            <string>req.query.endDate ?? null
         );
 
-        if (showtimes !== null) {
-            res.status(200).json(showtimes);
-        } else {
-            res.status(404).json({ message : `Showtimes not found.` });
-        }
+        res.status(200).json(showtimes);
     } catch (error) {
         if (error instanceof Error) {
             res.status(500).json({ message: error.message });
@@ -24,14 +19,14 @@ export async function getShowtimes(req: Request, res: Response) {
 
 export async function getShowtimeById(req: Request, res: Response) {
     try {
-        const showtimeId: number = parseInt(req.params.id);
+        const showtimeId: number = parseInt(req.params.showtimeId);
 
-        const showtime = await showtimeRepository.findShowtimeById(showtimeId);
-
-        if (showtime !== null) {
-            res.status(200).json(showtime);
+        if (isNaN(showtimeId)) {
+            res.status(400).json({ message: "Invalid showtimeId parameter" });
         } else {
-            res.status(404).json({ message : `Showtime ${showtimeId} not found.` });
+            const showtime = await showtimeRepository.findShowtimeById(showtimeId);
+
+            res.status(200).json(showtime);
         }
     } catch (error) {
         if (error instanceof Error) {
@@ -40,16 +35,20 @@ export async function getShowtimeById(req: Request, res: Response) {
     }
 }
 
-export async function getCurrentShowtimeByHall(req: Request, res: Response) {
+export async function getCurrentShowtimes(req: Request, res: Response) {
     try {
-        const hallId: number = parseInt(req.params.hallId);
+        const hallId = req.query.hallId ? parseInt(<string>req.query.hallId) : null;
 
-        const showtime = await showtimeRepository.findCurrentShowtimeByHall(hallId);
-
-        if (showtime !== null) {
-            res.status(200).json(showtime);
+        if (hallId !== null && isNaN(hallId)) {
+            res.status(400).json({ message: "Invalid hallId parameter" });
         } else {
-            res.status(404).json({ message : `No current showtime from hall ${hallId} found.` });
+            const currentShowtimes = await showtimeRepository.findCurrentShowtimes(hallId);
+
+            if (hallId !== null) {
+                res.status(200).json(currentShowtimes.length > 0 ? currentShowtimes[0] : null);
+            } else {
+                res.status(200).json(currentShowtimes);
+            }
         }
     } catch (error) {
         if (error instanceof Error) {
@@ -68,8 +67,6 @@ export async function createShowtime(req: Request, res: Response) {
             parseInt(req.body.hallId)
         );
 
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "create", body: showtimeToCreate}));
-
         res.status(201).json(showtimeToCreate);
     } catch (error) {
         if (error instanceof Error) {
@@ -81,15 +78,13 @@ export async function createShowtime(req: Request, res: Response) {
 export async function updateShowtime(req: Request, res: Response) {
     try {
         const showtimeToUpdate = await showtimeRepository.updateShowtime(
-            parseInt(req.params.id),
+            parseInt(req.params.showtimeId),
             new Date(req.body.startTime),
             new Date(req.body.endTime),
             parseInt(req.body.price),
             parseInt(req.body.movieId),
             parseInt(req.body.hallId)
         );
-
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "update", body: showtimeToUpdate}));
 
         res.status(200).json(showtimeToUpdate);
     } catch (error) {
@@ -102,10 +97,8 @@ export async function updateShowtime(req: Request, res: Response) {
 export async function deleteShowtime(req: Request, res: Response) {
     try {
         const showtimeToDelete = await showtimeRepository.deleteShowtime(
-            parseInt(req.params.id)
+            parseInt(req.params.showtimeId)
         );
-
-        await publishMessage("showtime", JSON.stringify({ type: "showtime", event: "delete", body: showtimeToDelete}));
 
         res.status(200).json({ message: "Showtime deleted successfully." });
     } catch (error) {

@@ -4,11 +4,11 @@ import passport from "../middleware/passport";
 
 const router: Router = Router();
 
-router.get("/showtime", passport.authenticate("jwt", { session: false }), showtimeController.getShowtimes);
-router.get("/showtime/:id", passport.authenticate("jwt", { session: false }), showtimeController.getShowtimeById);
-router.get("/showtime/:hallId/current-showtime", passport.authenticate("jwt", { session: false }), showtimeController.getCurrentShowtimeByHall);
+router.get("/showtime", showtimeController.getShowtimes);
+router.get("/showtime/current-showtime", showtimeController.getCurrentShowtimes);
+router.get("/showtime/:showtimeId", showtimeController.getShowtimeById);
 router.post("/showtime", passport.authenticate("jwt", { session: false }), showtimeController.createShowtime);
-router.put("/showtime/:id", passport.authenticate("jwt", { session: false }), showtimeController.updateShowtime);
-router.delete("/showtime/:id", passport.authenticate("jwt", { session: false }), showtimeController.deleteShowtime);
+router.put("/showtime/:showtimeId", passport.authenticate("jwt", { session: false }), showtimeController.updateShowtime);
+router.delete("/showtime/:showtimeId", passport.authenticate("jwt", { session: false }), showtimeController.deleteShowtime);
 
 export default router;
