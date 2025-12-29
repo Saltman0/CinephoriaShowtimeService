@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as showtimeRepository from "../repository/showtime.repository";
+import {publishMessage} from "../rabbitmq";
 
 export async function getShowtimes(req: Request, res: Response) {
     try {
@@ -98,6 +99,17 @@ export async function deleteShowtime(req: Request, res: Response) {
     try {
         const showtimeToDelete = await showtimeRepository.deleteShowtime(
             parseInt(req.params.showtimeId)
+        );
+
+        await publishMessage(
+            "booking",
+            JSON.stringify(
+                {
+                    type: "booking",
+                    event: "deleteByShowtime",
+                    body: {showtimeId: showtimeToDelete.id}
+                }
+            )
         );
 
         res.status(200).json({ message: "Showtime deleted successfully." });
